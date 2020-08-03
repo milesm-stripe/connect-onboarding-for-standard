@@ -27,6 +27,7 @@ end
 post '/onboard-user' do
   content_type 'application/json'
 
+# create an account
   account = Stripe::Account.create(
     type: 'standard',
     business_type: 'individual',
@@ -35,6 +36,40 @@ post '/onboard-user' do
 
   session[:account_id] = account.id
 
+# we already know the biz rep, so let's add them
+# so onboarding doesn't ask them
+  person = Stripe::Account.create_person(
+    account.id,
+    {
+      first_name: 'Jane',
+      last_name: 'Diaz',
+      email: 'jane.diaz@example.com',
+      address: {
+        line1: 'address_full_match',
+        city: 'San Francisco',
+        state: 'CA',
+        postal_code: '94103',
+        country: 'US',
+      },
+      dob: {
+        day: '01',
+        month: '01',
+        year: '1901',
+      },
+      id_number: '000000000',
+      ssn_last_4: '0000',
+      phone: '+15555555555',
+      relationship: {
+        executive: true,
+        representative: true,
+        title: 'Director of Human Resources'
+      },
+    },
+  )
+
+  puts "Created person #{person.id}"
+
+# create an onboarding link
   origin = request_headers['origin']
 
   account_link = Stripe::AccountLink.create(
