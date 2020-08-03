@@ -28,6 +28,8 @@ post '/onboard-user' do
   content_type 'application/json'
 
 # create an account
+# You can prefill account info with optional params
+# https://stripe.com/docs/api/accounts/create
   account = Stripe::Account.create(
     type: 'standard',
     business_type: 'individual',
@@ -38,6 +40,7 @@ post '/onboard-user' do
 
 # we already know the biz rep, so let's add them
 # so onboarding doesn't ask them
+# https://stripe.com/docs/api/persons/create
   person = Stripe::Account.create_person(
     account.id,
     {
